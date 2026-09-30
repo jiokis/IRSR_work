@@ -1,0 +1,120 @@
+# 红外物理知识表：开放词汇 → 发射率 ε 区间 + 出处
+# 说明：
+#   * 每条常数必须可追溯；给的是【区间 + 默认置信度】，不做点值硬猜
+#   * provenance 分级（诚实标注，避免"看起来精确其实是编的" ✗）
+#       A = 有 DOI 的实测/光谱库文献，可直接引用
+#       B = 权威手册/教科书的一般表述，尚未逐条核对版次页码（引用时需补页码）
+#   * band: FLIR-IISR / M3FD 为长波红外（LWIR，8–14 µm），发射主导，反射成分弱
+version: 2
+band_assumption: LWIR
+provenance_legend:
+  A: "有 DOI 的实测文献或公开光谱库"
+  B: "权威手册/教科书一般表述（待补页码）"
+canonical_refs:
+  steketee1973:
+    cite: "Steketee, J. (1973). Spectral emissivity of skin and pericardium. Physics in Medicine & Biology, 18(5), 686–694."
+    doi: "10.1088/0031-9155/18/5/307"
+    class: A
+  aster_v2:
+    cite: "Baldridge, A.M., Hook, S.J., Grove, C.I., Rivera, G. (2009). The ASTER Spectral Library Version 2.0. Remote Sensing of Environment, 113(4), 711–715."
+    doi: "10.1016/J.RSE.2008.11.007"
+    class: A
+    note: "公开光谱库（含矿物/植被/水体/人工材料在 8–14 µm 的反射率与发射率谱），本表陆地材料区间据其谱形归纳"
+  ir_handbook:
+    cite: "Wolfe, W.L., Zissis, G.J. (eds.). The Infrared Handbook. ERIM / Office of Naval Research."
+    class: B
+  modest:
+    cite: "Modest, M.F. Radiative Heat Transfer (3rd ed.). Academic Press."
+    class: B
+    note: "金属与介质的 ε 量级与温度/粗糙度依赖关系（待补页码）"
+  li2024:
+    cite: "Li, L.-F. et al. (2024). Accurately Measuring the Infrared Spectral Emissivity of Inconel 601, Inconel 625 and Inconel 718. Sensors, 24(18), 5906."
+    doi: "10.3390/s24185906"
+    class: A
+    note: "金属合金在红外波段的实测 ε（氧化/粗糙度显著抬升 ε）"
+  mahesh2001:
+    cite: "Mahesh, A., Walden, V.P., Warren, S.G. (2001). Ground-Based Infrared Remote Sensing of Cloud Properties over the Antarctic Plateau. Journal of Applied Meteorology, 40(7), 1279-1294."
+    doi: "10.1175/1520-0450(2001)040<1279:GBIRSO>2.0.CO;2"
+    class: A
+    note: "云的等效发射率反演（厚云趋于黑体）"
+  morales2023:
+    cite: "Morales-Salinas, L. et al. (2023). Assessment of atmospheric emissivity models for clear-sky conditions. Scientific Reports, 13, 12700."
+    doi: "10.1038/s41598-023-40499-6"
+    class: A
+    note: "晴空大气发射率模型（晴空有效发射率远低于 1）"
+classes:
+  person:
+    zh: 人体/衣物
+    eps: [0.96, 0.99]
+    conf: 0.90
+    provenance: A
+    ref: steketee1973
+    source: "Steketee (1973) 实测人体皮肤在 8–14 µm 的 ε≈0.98；衣物随材质变化，故区间取 0.96–0.99"
+  vegetation:
+    zh: 植被
+    eps: [0.96, 0.99]
+    conf: 0.85
+    provenance: A
+    ref: aster_v2
+    source: "ASTER 光谱库 v2.0 植被谱在 8–14 µm 的 ε 区间"
+  water:
+    zh: 水体
+    eps: [0.92, 0.96]
+    conf: 0.70
+    provenance: A
+    ref: aster_v2
+    source: "ASTER 光谱库水体谱；ε 受水面状态（泡沫/波纹）影响，故置信度较低"
+  asphalt:
+    zh: 沥青路面
+    eps: [0.88, 0.95]
+    conf: 0.85
+    provenance: A
+    ref: aster_v2
+    source: "ASTER 光谱库人工材料谱（沥青类）8–14 µm 区间"
+  concrete:
+    zh: 混凝土
+    eps: [0.85, 0.95]
+    conf: 0.80
+    provenance: A
+    ref: aster_v2
+    source: "ASTER 光谱库人工材料谱（混凝土/水泥）区间"
+  metal:
+    zh: 金属/车体
+    eps: [0.05, 0.30]
+    conf: 0.60
+    provenance: A
+    ref: li2024
+    source: "Li et al. (2024) 实测金属合金 ε；结合教科书量级：抛光金属 ε 可低至 0.05 以下，氧化/涂装后升至 0.3 以上，区间宽故置信度低"
+  glass:
+    zh: 玻璃/窗
+    eps: [0.85, 0.95]
+    conf: 0.50
+    provenance: B
+    ref: ir_handbook
+    source: "更正：普通钠钙窗玻璃在 8–14 µm 存在强吸收带，宏观上【不透明且高发射】，故区间取 0.85–0.95；另注：若为红外透射材料（Ge/ZnSe 等）则不适用本区间。出处待补（B 级）"
+  sky_cloud:
+    zh: 云
+    eps: [0.95, 1.00]
+    conf: 0.70
+    provenance: A
+    ref: mahesh2001
+    source: "Mahesh et al. (2001) 云等效发射率反演：厚云趋于黑体 ε≈1"
+  sky_clear:
+    zh: 晴空
+    eps: [0.00, 0.05]
+    conf: 0.50
+    provenance: A
+    ref: morales2023
+    source: "Morales-Salinas et al. (2023) 晴空大气发射率模型：晴空有效发射率远低于 1"
+  unknown:
+    zh: 未知
+    eps: [0.00, 1.00]
+    conf: 0.00
+    provenance: B
+    ref: ir_handbook
+    source: "弃权类别：不做任何物理断言"
+# 使用纪律
+policy:
+  - "引用本表时，A 级可直接引 DOI；B 级必须补具体页码后方可写入论文参考文献"
+  - "表中区间用于约束与门控，不用于宣称逐点定标精度"
+  - "若实测 ε̂ 超出对应区间，优先怀疑语义标签错误（见 veto_rules.yaml），而非修改本表"

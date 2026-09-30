@@ -1,0 +1,21 @@
+# 物理否决规则（S7）：语义标签与实测物理量冲突时的处理
+# 逐条可审计：每条写清"触发条件 → 动作"，便于论文附录列出与人工复核
+version: 1
+rules:
+  - name: water_but_metal_like
+    if: {label: water, eps_measured: "> 0.98", note: "且呈规则镜面反光"}
+    action: {set_label: unknown, reason: "ε 实测远高于水区间，疑为镜面金属/玻璃"}
+  - name: metal_but_human_thermal
+    if: {label: metal, eps_measured: "< 0.6", note: "热对比形态与人体轮廓一致"}
+    action: {set_label: person, reason: "ε 低但热结构为人体，疑为语义误判"}
+  - name: clear_sky_low_position
+    if: {label: sky_clear, position: "下半部", has_structure: true}
+    action: {set_label: unknown, reason: "晴空不应出现在下半部且含结构"}
+  - name: cloud_but_hot
+    if: {label: sky_cloud, theta_measured: "> 0.8", note: "与云的黑体特征不符"}
+    action: {set_label: unknown, reason: "云近似黑体，热对比异常"}
+  - name: person_but_water_eps
+    if: {label: person, eps_measured: "in_water_range"}
+    action: {set_label: water, reason: "ε 落在水区间而非人体区间"}
+priority: eps_first        # 先按 ε 区间判，再看结构/位置
+unresolved_action: set_unknown    # 规则无法判定时一律降级为 unknown（宁可弃权）

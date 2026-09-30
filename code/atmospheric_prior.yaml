@@ -1,0 +1,24 @@
+# 大气路径先验：场景类型 → 有效透过率 tau 的先验区间
+# 用途：给退化头的 H_atmo 提供先验；也给先验场 tau_hat 提供查表值
+# 注意：这是"有效透过率"（含距离/湿度/能见度的综合效果），不是逐项物理量
+version: 1
+band: LWIR
+classes:
+  sky_clear:   {tau: [0.20, 0.50], note: "晴空：长路径、下行辐射为主，先验弱"}
+  sky_cloud:   {tau: [0.50, 0.75], note: "云：路径中等"}
+  vegetation:  {tau: [0.70, 0.90], note: "近景植被"}
+  water:       {tau: [0.60, 0.85], note: "水面常伴水汽"}
+  person:      {tau: [0.85, 0.98], note: "近距目标"}
+  asphalt:     {tau: [0.75, 0.92], note: "道路，中距"}
+  concrete:    {tau: [0.75, 0.92], note: "建筑，中距"}
+  metal:       {tau: [0.70, 0.90], note: "车辆/金属体"}
+  glass:       {tau: [0.60, 0.85], note: "玻璃：透射+反射混合"}
+  unknown:     {tau: [0.50, 0.95], note: "弃权：宽区间"}
+scene_modifiers:
+  fog:        {tau_scale: 0.5,  note: "有雾 → 透过率整体减半"}
+  rain:       {tau_scale: 0.65, note: "降雨衰减"}
+  haze:       {tau_scale: 0.75, note: "霾"}
+  clear:      {tau_scale: 1.0,  note: "无修正"}
+provenance:
+  basis: "有效透过率按 Beer-Lambert 形式 tau=exp(-beta*d) 归纳；数值为工程经验区间，非实测标定"
+  todo: "后续或可用气象数据（能见度/湿度）替换为解析式，见 docs/advisor/PhysIR设计思路.md 风险表"

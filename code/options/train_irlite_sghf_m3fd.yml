@@ -1,0 +1,66 @@
+name: irlite_sghf_m3fd
+model_type: SRModel
+scale: 4
+num_gpu: 1
+manual_seed: 10
+datasets:
+  train:
+    name: M3FD_train
+    type: PairedMultiModalDataset
+    phase: train
+    scale: 4
+    dataroot_gt: D:/datasets/M3FD_SR/train/gt
+    dataroot_lq: D:/datasets/M3FD_SR/train/lq
+    dataroot_vi: D:/datasets/M3FD_SR/train/vi
+    gt_size: 192
+    crop: true
+    use_hflip: true
+    use_rot: true
+    io_backend: {type: disk}
+    num_worker_per_gpu: 0
+    batch_size_per_gpu: 16
+    dataset_enlarge_ratio: 10
+    pin_memory: true
+  val:
+    name: M3FD_val
+    type: PairedMultiModalDataset
+    phase: val
+    scale: 4
+    dataroot_gt: D:/datasets/M3FD_SR/val/gt
+    dataroot_lq: D:/datasets/M3FD_SR/val/lq
+    dataroot_vi: D:/datasets/M3FD_SR/val/vi
+    crop: false
+    io_backend: {type: disk}
+network_g:
+  type: FDRNet
+  in_nc: 3
+  nf: 56
+  out_nc: 3
+  upscale: 4
+  block_types: [rfdx, rfdx, rfdx, rfdx]
+  sghf: true
+path:
+  pretrain_network_g: experiments/m3fdA_base/models/net_g_60000.pth
+  strict_load_g: false
+  resume_state: ~
+train:
+  ema_decay: 0.999
+  optim_g: {type: Adam, lr: !!float 1e-4, weight_decay: 0, betas: [0.9, 0.99]}
+  scheduler: {type: MultiStepLR, milestones: [20000, 32000], gamma: 0.5}
+  total_iter: 40000
+  warmup_iter: -1
+  pixel_opt: {type: L1Loss, loss_weight: 1.0, reduction: mean}
+  aux_w: !!float 0.05
+  ssim_opt: {type: SSIMLoss, loss_weight: 0.1, crop_border: 0, test_y_channel: false, reduction: mean}
+val:
+  val_freq: !!float 2e3
+  save_img: false
+  metrics:
+    psnr: {type: calculate_psnr, crop_border: 4, test_y_channel: false}
+    ssim: {type: calculate_ssim, crop_border: 4, test_y_channel: false}
+logger:
+  print_freq: 100
+  save_checkpoint_freq: !!float 1e4
+  use_tb_logger: true
+  wandb: {project: ~, resume_id: ~}
+dist_params: {backend: nccl, port: 29845}

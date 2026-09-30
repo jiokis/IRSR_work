@@ -1,0 +1,54 @@
+# 可见光/NIR 光谱行为表（跨模态投票 S5 的物理依据）
+# 用途：判断"可见光在该区域是否可信"（r̂ 物理可用性），以及 NIR 与 LWIR 亮暗关系
+version: 1
+classes:
+  vegetation:
+    vis_nir: high          # NIR 强反射（红边）
+    lwir_day: mid
+    lwir_night: low_mid
+    cross_modal_reliable: true      # 可见光结构可信
+  water:
+    vis_nir: low           # NIR 强吸收
+    lwir_day: low
+    lwir_night: low
+    cross_modal_reliable: false     # 水面可见光与红外的"结构"常不一致（镜面反射）
+  metal:
+    vis_nir: high_specular
+    lwir_day: high_reflect
+    lwir_night: mid
+    cross_modal_reliable: false     # 镜面反射，非漫反射结构
+  glass:
+    vis_nir: high
+    lwir_day: high_reflect
+    lwir_night: mid
+    cross_modal_reliable: false
+  asphalt:
+    vis_nir: low_mid
+    lwir_day: high_thermal
+    lwir_night: mid
+    cross_modal_reliable: true
+  concrete:
+    vis_nir: mid
+    lwir_day: mid
+    lwir_night: mid
+    cross_modal_reliable: true
+  person:
+    vis_nir: mid
+    lwir_day: mid
+    lwir_night: high_thermal      # 夜间人体热对比最强
+    cross_modal_reliable: true
+  sky_clear:
+    vis_nir: high
+    lwir_day: low
+    lwir_night: very_low
+    cross_modal_reliable: false
+  sky_cloud:
+    vis_nir: high
+    lwir_day: mid_high
+    lwir_night: mid
+    cross_modal_reliable: false
+  unknown:
+    vis_nir: unknown
+    lwir_day: unknown
+    lwir_night: unknown
+    cross_modal_reliable: false

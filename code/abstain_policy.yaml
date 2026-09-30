@@ -1,0 +1,22 @@
+# 弃权策略：什么情况下判定"语义/物理不足以支撑先验"，宁可弃权
+# 对应 tools/vlm/soft_topk.py 的 abstain_topk 与 topk_candidate_set
+version: 1
+topk:
+  per_source: 2          # 每个源保留的候选标签数（并集前）
+  final: 3               # 并集后按票质量保留的候选数（成本控制 + 集中投票）
+abstain:
+  rule: "语义与物理同时不可分才弃权（两个条件都要满足）"
+  semantic_margin: 0.15  # q_top1 - q_top2 < margin
+  physics_gap_sigma: 0.5 # top1/top2 的物理可分性（sigma 单位）< gap
+  max_abstain_ratio: 0.35  # 若弃权比例超过该值，说明源质量太差 -> 报警而不是硬跑
+cascade:
+  escalate_when: "低置信 或 top2 票差过小"
+  conf_thresh: 0.35
+  margin_thresh: 0.15
+  arbiter: "第二 VLM（7B）仅在争议区调用"
+night_policy:
+  if_time: night
+  vis_reliability: 0.3   # 夜间可见光语义可信度上限 -> 三因子门控据此降低注入
+  prefer_ir_semantics: true
+provenance:
+  basis: "阈值仅用于'是否触发弃权'，量纲统一到 sigma 与票差，避免逐数据集标定"
